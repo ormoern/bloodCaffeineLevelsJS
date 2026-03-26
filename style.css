@@ -4,7 +4,7 @@
   background: rgb(255, 245, 235)
 }
 
-#input_container, #data_container {
+#inputContainer, #dataContainer {
   display: flex;
   flex-direction: column;
   gap: 10px;
