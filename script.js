@@ -218,9 +218,7 @@ function createDashboard() {
     name: "showGraph",
     id: "showGraphButton",
     textContent: "Show graph"
-  });
-
-  // 
+  }); 
 };
 
 // --- ERROR HANDLING ---
