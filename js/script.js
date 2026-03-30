@@ -47,8 +47,8 @@ const state = {
 
 // create option values for select input type
 const createSelectOptions = (valueObject, selectElement) => {
-  const objectKeys = valueObject.keys
-  objectKeys.foreach((item, index) => {
+  const objectKeys = Object.keys(valueObject)
+  objectKeys.forEach((item, index) => {
     const option = document.createElement("option");
     option.value = item;
     option.textContent = item;
