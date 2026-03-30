@@ -257,6 +257,7 @@ function renderUI() {
 };
 
 const renderDataTable = (arrayOfValueObjects, container) => {
+  console.log("creating table")
   const table = document.createElement("table");
   table.id = "ValuesTable"
 
@@ -284,8 +285,8 @@ const renderDataTable = (arrayOfValueObjects, container) => {
     table.append(valuesRow);
   });
 
-  container.innerHTML = "ValuesTable";
-  container.appendChild(table);
+  container.innerHTML = "";
+  container.append(table);
 };
 
 // --- ERROR HANDLING ---
@@ -453,5 +454,5 @@ addDataButton.addEventListener("click", () => {
 
 clearDataButton.addEventListener("click", () => {
   state.data = [];
-  document.getElementById.innerHTML = "";
+  document.getElementById.innerHTML = "ValuesTable";
 });
