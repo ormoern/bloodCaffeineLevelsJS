@@ -261,7 +261,7 @@ const renderDataTable = (arrayOfValueObjects, container) => {
   const table = document.createElement("table");
   table.id = "ValuesTable"
 
-  keyLabels = Object.keys(arrayOfValueObject[0]);
+  keyLabels = Object.keys(arrayOfValueObjects[0]);
   const labelsRow = document.createElement("tr");
 
   keyLabels.forEach((key) => {
