@@ -2,9 +2,16 @@
 
 const state = {
   data: [],
+  errorMessages: {
+    "Empty, caffeine" : "",
+    "Empty, weight": "",
+    "Empty, drink": "",
+    "Symbols, weight": "",
+    "Undefined": "Undefined error"
+  },
   userData: {
     "BodyMass": 0,
-    "metabolismSpeedDisplay": ""
+    "metabolismSpeedDisplay": "",
     "metabolismSpeed": 0
   },
   customDrink: False,
@@ -35,6 +42,8 @@ const state = {
     "Low": 7.5
   }
 };
+
+const ui = renderUI();
 // --- HELPER FUNCTIONS ---
 
 // create option values for select input type
@@ -48,23 +57,18 @@ const createSelectOptions = (valueObject, selectElement) => {
   });
 };
 
-//error message
-const generateErrorMessage = (errorMessage, appendTarget) => {
-  const appendTargetAccess = document.getElementById(appendTarget);
-  const errorMessageContainer = document.createTextNode(errorMessage);
-
-  appendTargetAccess.append(errorMessageContainer);
-};
-
 // --- UI RENDERING ---
 
-function createDashboard() {
+function renderUI() {
   // --- access main containers ---
   const inputContainer = document.getElementById("inputContainer");
   const dataContainer = document.getElementById("dataContainer");
 
   // --- create subcontainers ---
   
+  // message container
+  const errorMessageContainer = document.createElement("div");
+
   // data input
   const presetDrinkContainer = document.createElement("div");
   const customDrinkContainer = document.createElement("div");
@@ -86,6 +90,7 @@ function createDashboard() {
   customDrinkContainer.classList.add("inputSubContainer");
   userInfoContainer.classList.add("inputSubContainer");
   buttonsContainer.classList.add("inputSubContainer");
+  errorMessageContainer.classList.add("inputSubContainer");
 
   // assign classes to data presenting subcontainers
   dataValuesContainer.classList.add("dataSubContainer")
@@ -97,6 +102,7 @@ function createDashboard() {
 
   // add subcontainers to main containers
   inputContainer.append(
+    errorMessageContainer,
     presetDrinkContainer, 
     customDrinkContainer, 
     userInfoContainer, 
@@ -219,39 +225,68 @@ function createDashboard() {
     id: "showGraphButton",
     textContent: "Show graph"
   }); 
+  return { 
+    inputContainer,
+    dataContainer,
+    errorMessageContainer, 
+    presetDrinkContainer, 
+    userInfoContainer, 
+    buttonsContainer, 
+    dataValuesContainer, 
+    graphContainer, 
+    actualDataContainer, 
+    drinkTableContainer, 
+    bodyMassBox, 
+    metabolismSpeedSelect, 
+    userInfoSaveButton, 
+    addDataButton, 
+    clearDataButton, 
+    showGraphButton
+ }
 };
 
 // --- ERROR HANDLING ---
 
-const checkInputText = (textInput) => {
+const checkInputText = (textInput, inputType) => {
   const regex = /[^A-Za-z0-9]/; //used to check for special characters, optional
   let errorMessage = "";
-  let errorState = False;
+  let inputValid = False;
+
   if (textInput.length === 0 || textInput === null) {
-    errorMessage = "Empty"
-    errorState = True
-    return errorState, errorMessage
+    errorType = "Empty," + inputType;
+    errorMessage = state.data.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+
+    inputValid = False;
+    return inputValid
   } else {
-    errorState = False
-    return errorState
+    inputValid = True
+    return inputValid
   };
 };
 
-const checkInputNumber = (numberInput) => {
+const checkInputNumber = (numberInput, inputType) => {
   const regex = /[^0-9]/; //used to check for special characters or letters
   let errorMessage = "";
-  let errorState = False;
+  let inputValid = False;
+
   if (numberInput.length === 0 || textInput === null) {
-    errorMessage = "Empty";
-    errorState = True;
-    return errorMessage
+    errorType = "Empty," + inputType;
+    errorMessage = state.data.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+
+    inputValid = False;
+    return inputValid
   } else if (regex.test(numberInput)) {
-    errorState = True;
-    errorMessage = "Symbols"
-    return errorMessage
+    errorType = "Symbols," + inputType;
+    errorMessage = state.data.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+
+    inputValid = False;
+    return inputValid
   } else {
-    errorState = False;
-    return ErrorState
+    inputValid = True;
+    return inputValid
   };
 };
 
@@ -267,16 +302,16 @@ const timeToDecInt = (timeInput) => {
 
 // --- USER ACTIONS ---
 // access input fields
-const bodyMass = document.getElementById("bodyMass");
-const metabolismSpeed = document.getElementById("metabolismSpeed");
-const inputTime = document.getElementById("inputTime");
-const customDrink = data.customDrink
-const customDrinkName = document.getElementById("customDrinkName");
-const customDrinkCaffeine = document.getElementById("customDrinkCaffeine");
-const presetDrink = document.getElementById("presetDrink");
+const bodyMass = ui.bodyMass;
+const metabolismSpeed = ui.metabolismSpeed;
+const inputTime = ui.inputTime;
+const customDrink = data.customDrink;
+const customDrinkName = ui.customDrinkName;
+const customDrinkCaffeine = ui.customDrinkCaffeine;
+const presetDrink = ui.presetDrink;
 
 // checkbox action
-const customDrinkCheckBox = document.getElementById("customDrinkCheckBox");
+const customDrinkCheckBox = ui.customDrinkCheckBox;
 customDrinkCheckBox.addEventListener("change", () => {
   if (customDrinkCheckBox.checked) {
     data.customDrink = True;
@@ -287,10 +322,10 @@ customDrinkCheckBox.addEventListener("change", () => {
 
 // --- button actions ---
 // access buttons
-const addDataButton = document.getElementById("addDataButton");
-const clearDataButton = document.getElementById("clearDataButton");
-const showGraphButton = document.getElementById("showGraphButton");
-const userInfoSaveButton = document.getElementById("userInfoSaveButton");
+const addDataButton = ui.addDataButton;
+const clearDataButton = ui.clearDataButton;
+const showGraphButton = ui.showGraphButton;
+const userInfoSaveButton = ui.userInfoSaveButton;
 
 const undefinedError = "Undefined error..."
 let errorMessage = ""
@@ -298,40 +333,50 @@ let errorMessage = ""
 userInfoSaveButton.addEventListener("click", () => {
   let bodyMassValue = bodyMass.value;
   let metabolismSpeedValue = metabolismSpeed.value;
-  let bodyMassCheckedValue = checkInputNumber(bodyMassValue)
+  let bodyMassInputValid = checkInputNumber(bodyMassValue);
 
-  if (typeof bodyMassCheckedValue === "boolean") { // consider moving error handling into separate block
-    data.userData.bodyMass = bodyMassValue;        // only use handleForErrors(providedValue)
-  } else if (typeof bodyMassCheckedValue === "string") {
-    if (bodyMassCheckedValue === "Empty") {
-      errorMessage = "No body mass... Ethereal...";
-      generateErrorMessage(errorMessage, inputContainer);
-      return
-    } else {
-      errorMessage = "Not a valid number...";
-      generateErrorMessage(errorMessage, inputContainer);
-      return
+  if (bodyMassInputValid) {
+    state.userData.bodyMass = bodyMassValue;
   } else {
-    generateErrorMessage(undefinedError, inputContainer);
-    return
-  };
+    state.userData.bodyMass = 0;
   };
 
-  data.userData.metabolismSpeedDisplay = metabolismSpeedValue;
-  data.userData.metabolismSpeed = data.metabolismSpeed[metabolismSpeedValue]
+  state.userData.metabolismSpeedDisplay = metabolismSpeedValue;
+  state.userData.metabolismSpeed = data.metabolismSpeed[metabolismSpeedValue];
+
   return
 });
 
 addDataButton.addEventListener("click", () => {
+  let dataOutput = {}
   if (inputTime.value != "" || inputTime.value != null) {
     let timeValue = timeToDecInt(inputTime.value);
   } else if (inputTime.value === "" || inputTime.value === null)  {
-    generateErrorMessage("")
-  }
-  customDrinkNameValue = checkInputText(customDrinkName.value);
-  customDrinkCaffeineValue = checkInputNumber(customDrinkCaffeine);
-  presetDrinkValue = presetDrink.value;
+    ui.errorMessageContainer.textContent = "Time not provided."
+  };
 
-// --- 27.03 16.03 stopped here ---
-})
+  if (state.customDrink) {
+    let customDrinkNameValid = checkInputText(customDrinkName.value);
+    let customDrinkCaffeineValid = checkInputNumber(customDrinkCaffeine.value);
+    if (customDrinkNameValid && customDrinkCaffeineValid) {
+      let customDrinkValue = customDrinkName.value;
+      let customDrinkCaffeineValue = customDrinkCaffeine.value;
+      dataOutput = {
+        timeValue,
+        customDrinkValue,
+        customDrinkCaffeineValue
+      }
+    };
+  } else {
+    let presetDrinkValue = presetDrink.value;
+    let presetDrinkCaffeineValue = state.presetDrinks(presetDrink);
+    dataOutput = {
+      timeValue,
+      presetDrinkValue,
+      presetDrinkCaffeineValue
+    };
+  };
+  
+  return
+});
 
