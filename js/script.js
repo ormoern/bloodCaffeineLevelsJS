@@ -10,7 +10,7 @@ const state = {
     "Undefined": "Undefined error"
   },
   userData: {
-    "BodyMass": 0,
+    "bodyMass": 0,
     "metabolismSpeedDisplay": "",
     "metabolismSpeed": 0
   },
@@ -357,8 +357,8 @@ userInfoSaveButton.addEventListener("click", () => {
   };
 
   state.userData.metabolismSpeedDisplay = metabolismSpeedValue;
-  state.userData.metabolismSpeed = state.data.metabolismSpeed[metabolismSpeedValue];
-
+  state.userData.metabolismSpeed = state.metabolismSpeed[metabolismSpeedValue];
+  console.log(state.userData)
   return
 });
 
