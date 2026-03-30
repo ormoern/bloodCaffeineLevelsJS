@@ -3,10 +3,10 @@
 const state = {
   data: [],
   errorMessages: {
-    "Empty, caffeine" : "",
-    "Empty, weight": "",
-    "Empty, drink": "",
-    "Symbols, weight": "",
+    "Empty, caffeine" : "No caffeine amount...",
+    "Empty, weight": "No body mass... ethereal...",
+    "Empty, drink": "No drink name...",
+    "Symbols, weight": "Symbols in body mass? Unacceptable...",
     "Undefined": "Undefined error"
   },
   userData: {
@@ -375,6 +375,9 @@ addDataButton.addEventListener("click", () => {
 
   if (!timeInput.value) {
     ui.errorMessageContainer.textContent = "Time not provided."
+    setTimeout = (() => {
+      ui.errorMessageContainer.textContent = "";
+    }, 1000);
   } else {
     timeValue = timeToDecInt(timeInput.value);
   };
