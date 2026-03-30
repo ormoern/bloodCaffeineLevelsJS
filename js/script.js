@@ -317,12 +317,12 @@ const ui = renderUI();
 
 // --- USER ACTIONS ---
 // access input fields
-const bodyMass = ui.bodyMass;
-const metabolismSpeed = ui.metabolismSpeed;
+const bodyMass = ui.bodyMassBox;
+const metabolismSpeed = ui.metabolismSpeedSelect;
 const timeInput = ui.timeInputBox;
-const customDrinkName = ui.customDrinkName;
-const customDrinkCaffeine = ui.customDrinkCaffeine;
-const presetDrink = ui.presetDrink;
+const customDrinkName = ui.customDrinkNameBox;
+const customDrinkCaffeine = ui.customDrinkCaffeineBox;
+const presetDrink = ui.presetDrinkSelect;
 
 // checkbox action
 const customDrinkCheckBox = ui.customDrinkCheckBox;
