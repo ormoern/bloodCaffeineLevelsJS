@@ -393,8 +393,8 @@ addDataButton.addEventListener("click", () => {
         customDrinkValue,
         customDrinkCaffeineValue
       };
-    } else {
-        ui.errorMessageContainer.textContent = "No info provided...";
+    } else if (!customDrinkNameValid && !customDrinkCaffeineValid) {
+        ui.errorMessageContainer.textContent = "No custom drink info provided...";
         setTimeout(() => {
           ui.errorMessageContainer.textContent = "";
         }, 5000);
@@ -414,7 +414,7 @@ addDataButton.addEventListener("click", () => {
   if (isNotEmpty(dataOutput)) {
     state.data.push(dataOutput);
   };
-
+  console.log("Data entry:", dataOutput)
   console.log("Aggregate data:", state.data)
   return
 });
