@@ -230,7 +230,7 @@ function renderUI() {
     metabolismSpeedSelect,
     userInfoSaveButton
   );
-  
+
   return { 
     inputContainer,
     dataContainer,
@@ -315,7 +315,7 @@ const ui = renderUI();
 const bodyMass = ui.bodyMass;
 const metabolismSpeed = ui.metabolismSpeed;
 const inputTime = ui.inputTime;
-const customDrink = data.customDrink;
+const customDrink = state.customDrink;
 const customDrinkName = ui.customDrinkName;
 const customDrinkCaffeine = ui.customDrinkCaffeine;
 const presetDrink = ui.presetDrink;
@@ -324,9 +324,9 @@ const presetDrink = ui.presetDrink;
 const customDrinkCheckBox = ui.customDrinkCheckBox;
 customDrinkCheckBox.addEventListener("change", () => {
   if (customDrinkCheckBox.checked) {
-    data.customDrink = true;
+    customDrink = true;
   } else {
-    data.customDrink = false;
+    customDrink = false;
   };
 });
 
@@ -352,7 +352,7 @@ userInfoSaveButton.addEventListener("click", () => {
   };
 
   state.userData.metabolismSpeedDisplay = metabolismSpeedValue;
-  state.userData.metabolismSpeed = data.metabolismSpeed[metabolismSpeedValue];
+  state.userData.metabolismSpeed = state.data.metabolismSpeed[metabolismSpeedValue];
 
   return
 });
