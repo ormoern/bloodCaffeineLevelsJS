@@ -95,7 +95,7 @@ function renderUI() {
   dataValuesContainer.classList.add("dataSubContainer")
   graphContainer.classList.add("dataSubContainer")
 
-  // assign classes to data data value subcontainers
+  // assign classes to data value subcontainers
   actualDataContainer.classList.add("dataSubSubContainer")
   drinkTableContainer.classList.add("dataSubSubContainer")
 
@@ -354,6 +354,12 @@ const timeToDecInt = (timeInput) => {
 
 const ui = renderUI();
 
+// --- RENDER GRAPH ---
+
+/*const renderGraph = (arrayOfValueObjects, container) => {
+
+};*/
+
 
 // --- USER ACTIONS ---
 // access input fields
@@ -453,6 +459,13 @@ addDataButton.addEventListener("click", () => {
 
 clearDataButton.addEventListener("click", () => {
   state.data = [];
+  state.userData = {};
   const dataTable = document.getElementById("ValuesTable");
   dataTable.innerHTML = ""
 });
+
+/* showGraphButton.addEventListener("click", () => {
+  const graphContainer = ui.graphContainer;
+  graphContainer.innerHTML = "";
+  renderGraph(state.data, graphContainer);
+}); */
