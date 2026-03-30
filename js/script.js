@@ -226,9 +226,9 @@ function renderUI() {
   }); 
 
   buttonsContainer.append(
-    bodyMassBox, 
-    metabolismSpeedSelect,
-    userInfoSaveButton
+    addDataButton, 
+    clearDataButton,
+    showGraphButton
   );
 
   return { 
@@ -315,13 +315,13 @@ const ui = renderUI();
 const bodyMass = ui.bodyMass;
 const metabolismSpeed = ui.metabolismSpeed;
 const inputTime = ui.inputTime;
-const customDrink = state.customDrink;
 const customDrinkName = ui.customDrinkName;
 const customDrinkCaffeine = ui.customDrinkCaffeine;
 const presetDrink = ui.presetDrink;
 
 // checkbox action
 const customDrinkCheckBox = ui.customDrinkCheckBox;
+const customDrink = state.customDrink;
 customDrinkCheckBox.addEventListener("change", () => {
   if (customDrinkCheckBox.checked) {
     customDrink = true;
