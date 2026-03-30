@@ -283,7 +283,7 @@ const checkInputNumber = (numberInput, inputType) => {
   let inputValid = false;
   let errorType = "";
 
-  if (numberInput.length === 0 || textInput === null) {
+  if (numberInput.length === 0 || numberInput === null) {
     errorType = "Empty," + inputType;
     errorMessage = state.data.errorMessages[errorType];
     ui.errorMessageContainer.textContent = errorMessage;
@@ -350,7 +350,7 @@ let errorMessage = ""
 userInfoSaveButton.addEventListener("click", () => {
   let bodyMassValue = bodyMass.value;
   let metabolismSpeedValue = metabolismSpeed.value;
-  let bodyMassInputValid = checkInputNumber(bodyMassValue);
+  let bodyMassInputValid = checkInputNumber(bodyMassValue, "weight");
 
   if (bodyMassInputValid) {
     state.userData.bodyMass = bodyMassValue;
@@ -375,8 +375,8 @@ addDataButton.addEventListener("click", () => {
   };
 
   if (state.customDrink) {
-    let customDrinkNameValid = checkInputText(customDrinkName.value);
-    let customDrinkCaffeineValid = checkInputNumber(customDrinkCaffeine.value);
+    let customDrinkNameValid = checkInputText(customDrinkName.value, "drink");
+    let customDrinkCaffeineValid = checkInputNumber(customDrinkCaffeine.value, "caffeine");
     if (customDrinkNameValid && customDrinkCaffeineValid && timeValue) {
       let customDrinkValue = customDrinkName.value;
       let customDrinkCaffeineValue = customDrinkCaffeine.value;
