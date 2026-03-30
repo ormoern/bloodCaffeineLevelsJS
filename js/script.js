@@ -262,6 +262,7 @@ const checkInputText = (textInput, inputType) => {
   const regex = /[^A-Za-z0-9]/; //used to check for special characters, optional
   let errorMessage = "";
   let inputValid = false;
+  let errorType = "";
 
   if (textInput.length === 0 || textInput === null) {
     errorType = "Empty," + inputType;
@@ -280,6 +281,7 @@ const checkInputNumber = (numberInput, inputType) => {
   const regex = /[^0-9]/; //used to check for special characters or letters
   let errorMessage = "";
   let inputValid = false;
+  let errorType = "";
 
   if (numberInput.length === 0 || textInput === null) {
     errorType = "Empty," + inputType;
@@ -364,16 +366,18 @@ userInfoSaveButton.addEventListener("click", () => {
 
 addDataButton.addEventListener("click", () => {
   let dataOutput = {}
+  let timeValue = 0
+
   if (!timeInput.value) {
     ui.errorMessageContainer.textContent = "Time not provided."
   } else {
-    let timeValue = timeToDecInt(timeInput.value);
+    timeValue = timeToDecInt(timeInput.value);
   };
 
   if (state.customDrink) {
     let customDrinkNameValid = checkInputText(customDrinkName.value);
     let customDrinkCaffeineValid = checkInputNumber(customDrinkCaffeine.value);
-    if (customDrinkNameValid && customDrinkCaffeineValid) {
+    if (customDrinkNameValid && customDrinkCaffeineValid && timeValue) {
       let customDrinkValue = customDrinkName.value;
       let customDrinkCaffeineValue = customDrinkCaffeine.value;
       dataOutput = {
@@ -382,7 +386,7 @@ addDataButton.addEventListener("click", () => {
         customDrinkCaffeineValue
       }
     };
-  } else {
+  } else if (presetDrink && timeValue) {
     let presetDrinkValue = presetDrink.value;
     let presetDrinkCaffeineValue = state.presetDrinks[presetDrink];
     dataOutput = {
@@ -391,7 +395,7 @@ addDataButton.addEventListener("click", () => {
       presetDrinkCaffeineValue
     };
   };
-  
+  console.log(dataOutput);
   return
 });
 
