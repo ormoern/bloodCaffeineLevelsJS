@@ -43,7 +43,6 @@ const state = {
   }
 };
 
-const ui = renderUI();
 // --- HELPER FUNCTIONS ---
 
 // create option values for select input type
@@ -298,6 +297,10 @@ const timeToDecInt = (timeInput) => {
   timeDec = ((math.round((hoursInt + (minutesInt / 60)) * 100)) / 100)
   return timeDec
 };
+
+// --- render UI ---
+
+const ui = renderUI();
 
 
 // --- USER ACTIONS ---
