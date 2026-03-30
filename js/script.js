@@ -304,8 +304,8 @@ const checkInputNumber = (numberInput, inputType) => {
 // --- DATA PARSING ---
 
 const timeToDecInt = (timeInput) => {
-  hoursInt = parseInt(timeInput(0, 2));
-  minutesInt = parseInt(timeInput(-2));
+  hoursInt = parseInt(timeInput.slice(0, 2));
+  minutesInt = parseInt(timeInput.slice(-2));
   timeDec = ((math.round((hoursInt + (minutesInt / 60)) * 100)) / 100)
   return timeDec
 };
