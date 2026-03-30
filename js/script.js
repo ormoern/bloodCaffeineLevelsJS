@@ -455,5 +455,6 @@ addDataButton.addEventListener("click", () => {
 
 clearDataButton.addEventListener("click", () => {
   state.data = [];
-  document.getElementById.innerHTML = "ValuesTable";
+  const valuesTable = document.getElementById("ValuesTable");
+  valuesTable.innerHTML = ""
 });
