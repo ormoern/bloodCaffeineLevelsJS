@@ -277,7 +277,7 @@ const checkInputText = (textInput, inputType) => {
   };
   setTimeout = (() => {
     ui.errorMessageContainer.textContent = "";
-  }, 1000);
+  }, 5000);
 };
 
 const checkInputNumber = (numberInput, inputType) => {
@@ -307,7 +307,7 @@ const checkInputNumber = (numberInput, inputType) => {
 
   setTimeout = (() => {
     ui.errorMessageContainer.textContent = "";
-  }, 1000);
+  }, 5000);
 };
 
 // --- DATA PARSING ---
@@ -377,7 +377,7 @@ addDataButton.addEventListener("click", () => {
     ui.errorMessageContainer.textContent = "Time not provided."
     setTimeout = (() => {
       ui.errorMessageContainer.textContent = "";
-    }, 1000);
+    }, 5000);
   } else {
     timeValue = timeToDecInt(timeInput.value);
   };
