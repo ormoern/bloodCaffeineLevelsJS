@@ -374,7 +374,7 @@ addDataButton.addEventListener("click", () => {
   let timeValue = 0
 
   if (!timeInput.value) {
-    ui.errorMessageContainer.textContent = "Time not provided."
+    ui.errorMessageContainer.textContent = "Time not provided..."
     setTimeout(() => {
       ui.errorMessageContainer.textContent = "";
     }, 5000);
@@ -392,6 +392,11 @@ addDataButton.addEventListener("click", () => {
         timeValue,
         customDrinkValue,
         customDrinkCaffeineValue
+      } else {
+        ui.errorMessageContainer.textContent = "No info provided...";
+        setTimeout(() => {
+          ui.errorMessageContainer.textContent = "";
+        }, 5000);
       }
     };
   } else if (presetDrink && timeValue) {
@@ -403,9 +408,14 @@ addDataButton.addEventListener("click", () => {
       presetDrinkCaffeineValue
     };
   };
-  console.log(dataOutput);
-  state.data.push(dataOutput);
-  console.log(`Aggregate data: ${state.data}`)
+
+  const isNotEmpty = obj => Object.keys(obj).length > 0;
+
+  if isNotEmpty(dataOutput) {
+    state.data.push(dataOutput);
+  };
+  
+  console.log("Aggregate data:", state.data)
   return
 });
 
