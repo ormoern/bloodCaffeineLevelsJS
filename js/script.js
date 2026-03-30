@@ -224,6 +224,13 @@ function renderUI() {
     id: "showGraphButton",
     textContent: "Show graph"
   }); 
+
+  buttonsContainer.append(
+    bodyMassBox, 
+    metabolismSpeedSelect,
+    userInfoSaveButton
+  );
+  
   return { 
     inputContainer,
     dataContainer,
