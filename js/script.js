@@ -409,9 +409,7 @@ addDataButton.addEventListener("click", () => {
     };
   };
 
-  const isNotEmpty = (obj) => { !Object.keys(obj).length };
-
-  if (isNotEmpty(dataOutput)) {
+  if (Object.keys(dataOutput).length > 0) {
     state.data.push(dataOutput);
   };
   console.log("Data entry:", dataOutput)
