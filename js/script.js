@@ -361,8 +361,6 @@ userInfoSaveButton.addEventListener("click", () => {
 
   if (bodyMassInputValid) {
     state.userData.bodyMass = bodyMassValue;
-  } else {
-    state.userData.bodyMass = 0;
   };
 
   state.userData.metabolismSpeedDisplay = metabolismSpeedValue;
