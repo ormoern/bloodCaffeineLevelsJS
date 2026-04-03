@@ -104,7 +104,7 @@ const renderDataTable = (arrayOfValueObjects, container) => {
 
   keyLabels.forEach((key) => {
     const headingCell = document.createElement("th");
-    headingCell.textContent = keyLabels[key];
+    headingCell.textContent = key;
     labelsRow.append(headingCell);
   });
   table.append(labelsRow);
