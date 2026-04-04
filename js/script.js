@@ -339,7 +339,10 @@ function renderUI() {
     presetDrinkSelect,
     customDrinkNameBox,
     customDrinkCaffeineBox,
-    customDrinkCheckBox
+    customDrinkCheckBox,
+    bodyMassContainer,
+    metabolismSpeedContainer,
+    currentCaffeineContainer
  }
 };
 
@@ -417,6 +420,9 @@ const timeToDecInt = (timeInput) => {
 
 };*/
 
+// containers
+
+const drinkTableContainer = ui.drinkTableContainer
 
 // --- USER ACTIONS ---
 // access input fields
@@ -433,9 +439,14 @@ const customDrinkCheckBox = ui.customDrinkCheckBox;
 customDrinkCheckBox.addEventListener("change", () => {
   if (customDrinkCheckBox.checked) {
     state.customDrink = true;
+    customDrinkName.disabled = false;
+    customDrinkCaffeine.disabled = false;
   } else {
     state.customDrink = false;
+    customDrinkName.disabled = true;
+    customDrinkCaffeine.disabled = true;
   };
+
 });
 
 // --- button actions ---
@@ -460,7 +471,10 @@ userInfoSaveButton.addEventListener("click", () => {
   state.userData.metabolismSpeedDisplay = metabolismSpeedValue;
   state.userData.metabolismSpeed = state.metabolismSpeed[metabolismSpeedValue];
   console.log(state.userData)
-  return
+
+  bodyMassContainer.textContent = state.userData["bodyMass"];
+  metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
+  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"];
 });
 
 addDataButton.addEventListener("click", () => {
@@ -505,20 +519,17 @@ addDataButton.addEventListener("click", () => {
 
   if (Object.keys(dataOutput).length > 0) {
     state.data.push(dataOutput);
-    renderDataTable(state.data, ui.drinkTableContainer)
+    renderDataTable(state.data, drinkTableContainer)
   };
   console.log("Data entry:", dataOutput)
   console.log("Aggregate data:", state.data)
-
-
-  return
 });
 
 clearDataButton.addEventListener("click", () => {
   state.data = [];
   state.userData = {};
   const dataTable = document.getElementById("ValuesTable");
-  dataTable.innerHTML = ""
+  tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
 });
 
 /* showGraphButton.addEventListener("click", () => {
