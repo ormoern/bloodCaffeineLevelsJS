@@ -496,10 +496,10 @@ const renderGraph = (container) => {
   container.append(canvasContainer);
   const data = createYArray(state.data, state.userData)
 
-  new Chart(caffeineChart, {
+  new Chart(canvasContainer , {
     type: 'line',
     data: {
-      labels: data.timePoints;
+      labels: data.timePoints,
       datasets: [{
         label: 'Caffeine concentration, mg',
         data: data.totalConcentration,
