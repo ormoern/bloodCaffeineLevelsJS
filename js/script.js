@@ -458,7 +458,7 @@ const intakeContribution = (time, intakeTime, intakeConcentration, absorptionTim
     return (intakeConcentration * (0.5 ** ((time - (intakeTime + absorptionTime)) / metabolismSpeed)));
   }
 };
-const createYArray = (intakeData, userData) => {
+const createXYArray = (intakeData, userData) => {
   const parsedIntakeData = parseIntakeData(intakeData);
   const bodyMass = userData["bodyMass"];
   const metabolismSpeed = userData["metabolismSpeed"];
@@ -467,9 +467,9 @@ const createYArray = (intakeData, userData) => {
   const graphEnd = state.graphValues["timePeriodHH"];
   const graphPoints = state.graphValues["points"];
 
-  const xs = createXValueArray(graphStart, graphEnd, graphPoints);
+  const timePoints = createXValueArray(graphStart, graphEnd, graphPoints);
 
-  let totalConcentration = xs.map((time) => {
+  let totalConcentration = timePoints.map((time) => {
     return parsedIntakeData.reduce((sum, intake) => {
       return sum + intakeContribution(
         time,
@@ -484,20 +484,25 @@ const createYArray = (intakeData, userData) => {
 
   //const xyPairs = xs.map((x, i) => [x, totalConcentration[i]]);
 
-  return totalConcentration
+  return { 
+    totalConcentration,
+    timePoints
+  }
 };
 
 const renderGraph = (container) => {
   const canvasContainer = createElement("canvas");
   canvasContainer.id = "caffeineChart";
-  container.append(canvasContainer)
+  container.append(canvasContainer);
+  const data = createYArray(state.data, state.userData)
 
   new Chart(caffeineChart, {
     type: 'line',
     data: {
+      labels: data.timePoints;
       datasets: [{
         label: 'Caffeine concentration, mg',
-        data: createYArray(state.data, state.userData),
+        data: data.totalConcentration,
         borderWidth: 1
       }]
     },
