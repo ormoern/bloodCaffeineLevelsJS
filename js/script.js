@@ -2,6 +2,7 @@
 
 const state = {
   data: [],
+  chartData: [],
   errorMessages: {
     "Empty, caffeine" : "No caffeine amount...",
     "Empty, weight": "No body mass... ethereal...",
@@ -52,6 +53,8 @@ const state = {
     "points": 60 * 30, // 60 points per hour
   },
 };
+
+let caffeineChart;
 
 // --- HELPER FUNCTIONS ---
 
@@ -349,75 +352,6 @@ function renderUI() {
     currentCaffeineContainer
  }
 };
-
-// --- render UI ---
-
-const ui = renderUI();
-
-// --- ERROR HANDLING ---
-
-const checkInputText = (textInput, inputType) => {
-  const regex = /[^A-Za-z0-9]/; //used to check for special characters, optional
-  let errorMessage = "";
-  let inputValid = false;
-  let errorType = "";
-
-  if (textInput.length === 0 || textInput === null) {
-    errorType = "Empty," + inputType;
-    errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
-
-    inputValid = false;
-
-    setTimeout(() => {
-      ui.errorMessageContainer.textContent = "";
-    }, 5000);
-    return inputValid
-  } else {
-    inputValid = true
-    return inputValid
-  };
-};
-
-const checkInputNumber = (numberInput, inputType) => {
-  const regex = /[^0-9]/; //used to check for special characters or letters
-  let errorMessage = "";
-  let inputValid = false;
-  let errorType = "";
-
-  if (numberInput.length === 0 || numberInput === null || numberInput < 0) {
-    errorType = "Empty," + inputType;
-    errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
-    console.log(errorMessage)
-    inputValid = false;
-    return inputValid
-  } else if (regex.test(numberInput)) {
-    errorType = "Symbols," + inputType;
-    errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
-    console.log(errorMessage)
-    inputValid = false;
-    return inputValid
-  } else {
-    inputValid = true;
-    return inputValid
-  };
-
-  setTimeout(() => {
-    ui.errorMessageContainer.textContent = "";
-  }, 5000);
-};
-
-// --- DATA PARSING ---
-
-const timeToDecInt = (timeInput) => {
-  const hoursInt = parseInt(timeInput.slice(0, 2));
-  const minutesInt = parseInt(timeInput.slice(-2));
-  const timeDec = ((Math.round((hoursInt + (minutesInt / 60)) * 100)) / 100)
-  return timeDec
-};
-
 // --- RENDER GRAPH ---
 
 const parseIntakeData = (intakeData) => {
@@ -489,24 +423,91 @@ const createXYArray = (intakeData, userData) => {
     timePoints
   }
 };
-
 const renderGraph = (container) => {
   const canvasContainer = document.createElement("canvas");
   canvasContainer.id = "caffeineChart";
   container.append(canvasContainer);
-  const data = createYArray(state.data, state.userData)
-
-  new Chart(canvasContainer , {
+  const defaultTimePoints = createXValueArray(0, 24, 24*60);
+  caffeineChart = new Chart(canvasContainer , {
     type: 'line',
     data: {
-      labels: data.timePoints,
+      labels: defaultTimePoints,
       datasets: [{
         label: 'Caffeine concentration, mg',
-        data: data.totalConcentration,
+        data: [],
         borderWidth: 1
       }]
     },
   });
+};
+
+// --- render UI ---
+
+const ui = renderUI();
+const renderGraph(ui.graphContainer)
+
+// --- ERROR HANDLING ---
+
+const checkInputText = (textInput, inputType) => {
+  const regex = /[^A-Za-z0-9]/; //used to check for special characters, optional
+  let errorMessage = "";
+  let inputValid = false;
+  let errorType = "";
+
+  if (textInput.length === 0 || textInput === null) {
+    errorType = "Empty," + inputType;
+    errorMessage = state.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+
+    inputValid = false;
+
+    setTimeout(() => {
+      ui.errorMessageContainer.textContent = "";
+    }, 5000);
+    return inputValid
+  } else {
+    inputValid = true
+    return inputValid
+  };
+};
+
+const checkInputNumber = (numberInput, inputType) => {
+  const regex = /[^0-9]/; //used to check for special characters or letters
+  let errorMessage = "";
+  let inputValid = false;
+  let errorType = "";
+
+  if (numberInput.length === 0 || numberInput === null || numberInput < 0) {
+    errorType = "Empty," + inputType;
+    errorMessage = state.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+    console.log(errorMessage)
+    inputValid = false;
+    return inputValid
+  } else if (regex.test(numberInput)) {
+    errorType = "Symbols," + inputType;
+    errorMessage = state.errorMessages[errorType];
+    ui.errorMessageContainer.textContent = errorMessage;
+    console.log(errorMessage)
+    inputValid = false;
+    return inputValid
+  } else {
+    inputValid = true;
+    return inputValid
+  };
+
+  setTimeout(() => {
+    ui.errorMessageContainer.textContent = "";
+  }, 5000);
+};
+
+// --- DATA PARSING ---
+
+const timeToDecInt = (timeInput) => {
+  const hoursInt = parseInt(timeInput.slice(0, 2));
+  const minutesInt = parseInt(timeInput.slice(-2));
+  const timeDec = ((Math.round((hoursInt + (minutesInt / 60)) * 100)) / 100)
+  return timeDec
 };
 
 // containers
@@ -614,6 +615,12 @@ addDataButton.addEventListener("click", () => {
   };
   console.log("Data entry:", dataOutput)
   console.log("Aggregate data:", state.data)
+
+  state.chartData = createYArray(state.data, state.userData)
+
+  caffeineChart.data.datasets[0].data = state.chartData.totalConcentration;
+  caffeineChart.data.labels = state.chartData.timePoints;
+  caffeineChart.update();
 });
 
 clearDataButton.addEventListener("click", () => {
@@ -621,10 +628,9 @@ clearDataButton.addEventListener("click", () => {
   state.userData = {};
   const dataTable = document.getElementById("ValuesTable");
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
-});
 
-showGraphButton.addEventListener("click", () => {
-  const graphContainer = ui.graphContainer;
-  graphContainer.innerHTML = "";
-  renderGraph(graphContainer);
+  state.chartData =[]
+  caffeineChart.data.datasets[0].data = [];
+  caffeineChart.data.labels = createXValueArray(0, 24, 24*60);
+  caffeineChart.update();
 });
