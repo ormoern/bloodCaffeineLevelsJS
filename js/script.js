@@ -420,147 +420,70 @@ const timeToDecInt = (timeInput) => {
 
 // --- RENDER GRAPH ---
 
+const parseIntakeData = (intakeData) => {
+  console.log("Parsing intake data.");
+  let parsedIntakeData = [];
+
+  intakeData.forEach((entry) => { // format data
+    let valuePair = [];
+    valuePair.push(timeToDecInt(entry["Time"]));
+    valuePair.push(entry["Caffeine, mg"]);
+    parsedIntakeData.push(valuePair);
+  });
+  parsedIntakeData = parsedIntakeData.sort(function(a, b){return a[0] - b[0]})
+  console.log("Intake data parsed:" + parsedIntakeData);
+  return parsedIntakeData
+};
+
 const createXValueArray = (start, end, pointsAmount) => {
+  console.log("Creating array of X values.");
   const step = (end - start) / (pointsAmount - 1);
   const xArray = [];
 
   for (let i = 0; i < pointsAmount; i++) {
     xArray.push(start + (i * step))
   };
-
+  console.log("Created array of X values:" + xArray);
   return xArray
 };
-
-const parseIntakeData = (intakeData) => {
-  let intakeDataParsed = [];
-  let timeArray = [];
-  let smallestTime = 100;
-
-  intakeData.forEach((entry) => { // format data
-    let valuePair = [];
-    valuePair.push(timeToDecInt(entry["Time"]));
-    timeArray.push(timeToDecInt(entry["Time"]));
-    valuePair.push(entry["Caffeine, mg"]);
-    intakeDataParsed.push(valuePair);
-  });
-
-  timeArray.forEach((time) => { // find the time of the first intake
-    if (time < smallestTime) {
-      smallestTime = time;
-    };
-  });
-
-  return {
-    intakeDataParsed,
-    smallestTime
-  }
-}
-
-const createSegments = (intakeData, userData) => {
-  const parsedData = parseIntakeData(intakeData);
-  const parsedIntakeData = parsedData.intakeDataParsed;
-  const smallestTime = parsedData.smallestTime;
-
-  let graphSegments = [];
+const caffeineConcentration = (caffeineMg, bodyMass) => { 
   const caffeineVolumeOfDistribution = 0.6;
-
-  const bodyMass = userData[bodyMass];
-  const metabolismSpeed = userData[metabolismSpeed];
-
-  let currentCaffeineConcentration = 0;
-  let decayStart = 0;
-
-  const linear = (startX, startY, endX, endY) => x =>
-    startY + ((endY - startY) / (endX - startX)) * (x - startX);
-
-  const exponentialDecay = (startX, startY) => x =>
-    startY * (0.5 ** ((x - startX)/metabolismSpeed));
-
-
-  intakeDataFormatted.forEach((entry, index) => {
-    let intakeTime = entry[0];
-    let intakeCaffeine = entry[1];
-
-    let startX = intakeTime;
-    let startY = currentCaffeineConcentration;
-
-    currentCaffeineConcentration += (intakeCaffeine / (bodyMass * caffeineVolumeOfDistribution));
-    decayStart = intakeTime + 0.75; // 45min absorption
-    
-    let endX = decayStart;
-    let endY = currentCaffeineConcentration;
-
-    let graphSegmentAbsorption;
-    let graphSegmentDecay;
-
-    if (index == 0) {
-      graphSegmentAbsorption = {
-        fn: linear(startX, startY, endX, endY),
-        min: startX - 1,
-        max: endX,
-      }
-     } else {
-      graphSegmentAbsorption = {
-        fn: linear(startX, startY, endX, endY),
-        min: startX,
-        max: endX,
-      };
-    };
-
-    if ((intakeDataFormatted.length - 1) == index) {
-      graphSegmentDecay = {
-        fn: exponentialDecay(endX, endY),
-        min: endX,
-        max: state.graphValues[timePeriodHH],
-      };
-    } else {
-      graphSegmentDecay = {
-        fn: exponentialDecay(endX, endY),
-        min: endX,
-        max: intakeDataFormatted[index+1][0],
-      };
-    };
-
-    graphSegments.push(graphSegmentAbsorption, graphSegmentDecay)
-  });
-
-  return {
-    graphSegments,
-    smallestTime
+  return caffeineMg / (bodyMass * caffeineVolumeOfDistribution)
+};
+const intakeContribution = (time, intakeTime, intakeConcentration, absorptionTime, metabolismSpeed) => {
+  if (time < intakeTime) {
+	  return 0;
+  } else if (time <= (intakeTime + absorptionTime)) {
+    return ((intakeConcentration / absorptionTime) * (time - intakeTime));
+  } else if (time > (intakeTime + absorptionTime)) {
+    return (intakeConcentration * (0.5 ** ((time - (intakeTime + absorptionTime)) / metabolismSpeed)));
   }
 };
+const createXYArray = (intakeData, userData) => {
+  const parsedIntakeData = parseIntakeData(intakeData);
+  const bodyMass = userData["bodyMass"];
+  const metabolismSpeed = userData["metabolismSpeed"];
 
-const createSegmentData = (graphSegments, start, end, points) => {
-  //const xs = createXValueArray(smallestTime, state.graphValues[timePeriodHH], state.graphValues[points]);
-  const xs = createXValueArray(start, end, points); // array of x values created with function createXValueArray
-  const segmentData = xs.map(x => { // run function for every x
-    const seg = graphSegments.find(seg =>  // find the first segment in graphSegments that fits 
-      x >= seg.min && x <= seg.max  // these conditions
-    );
-    return {  // return pairs of values x and calculated y for a function in segments fn with passed x
-      x,
-      y: seg ? seg.fn(x) : null // if seg exists compute y, else null
-    };
-  });
-  return segmentData
-};
-
-const createXYarray = (intakeData, userData) => {
-  const userData = state.userData;
-  const intakeData = state.data;
-
-  const createSegments = createSegments(intakeData, userData);
-  const graphStart = createSegments.smallestTime;
-  const graphSegments = createSegments.graphSegments;
-  
+  const graphStart = parsedIntakeData[0][0] - 1; // the time of the first intake minus one hour
   const graphEnd = state.graphValues["timePeriodHH"];
   const graphPoints = state.graphValues["points"];
 
-  const graphValues = createSegmentData(graphSegments, graphStart, graphEnd, graphPoints);
+  const xs = createXValueArray(graphStart, graphEnd, graphPoints);
 
-  return graphValues
+  let totalConcentration = xs.map((time) => {
+    return parsedIntakeData.reduce((sum, intake) => {
+      return sum + intakeContribution(
+        time,
+        intake[0],
+        caffeineConcentration(intake[1], bodyMass),
+        0.75,
+        metabolismSpeed
+      );
+    }, 0);
+  });
+  console.log(totalConcentration)
+  return totalConcentration
 };
-
 
 // containers
 
