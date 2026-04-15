@@ -1,36 +1,39 @@
 * {
   font-family: Arial, Helvetica, sans-serif;
-  color: rgb(102, 76, 25);
-  background: rgb(255, 248, 232);
-
-  display: flex;
-  flex-direction: column;
-  gap: 0px;
-  padding: 0px;
+  color: #383642;
+  background: #383642;
 }
 
 #inputContainer {
   display: flex;
+  flex-wrap: nowrap;
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
+  gap: 1em;
+  padding: 0.3em;
 }
 
 #dataContainer {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 10px;
+  gap: 1em;
+  padding: 0.3em;
 }
 
 .inputSubContainer {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  gap: 10px;
-  padding: 10px;
+  gap: 1em;
+  padding: 0.3em;
+}
+
+.inputSubSubContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+
 }
 
 .dataValuesSubContainer{
@@ -38,15 +41,126 @@
   flex-direction: row;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
+  gap: 1em;
+  padding: 1em;
 }
 
 .dataSubContainer{
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   justify-content: center;
+  align-items: flex-start;
+  background: #92929f;
+  border-radius: 10px;
+  gap: 4em;
+  padding: 1em;
+  margin: auto;
+}
+
+#messageContainer {
+  width: 100%;
+  height: 2rem;
+  text-align: center;
+}
+
+input[type=text], input[type=time], select {
+  border: none;
+  background-color: #F3F4EF; 
+  color: #383642;
+  border-radius: 5px;
+  padding: 0.3em;
+  margin: 0.5em;
+  height: 1.5em;
+}
+
+option {
+  background-color: #F3F4EF; 
+  color: #383642;
+}
+
+select:hover,
+select:focus {
+  background: #dddddd;
+}
+
+option:checked {
+  background: #dddddd;
+}
+
+input:disabled {
+  background-color: #e2e0e0;
+  color: #d8d8d8;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 10px;
-  padding: 10px;
+  font-size: 0.8em;
+  padding: 0.3em;
+  margin: 0.5em;
+  height: 1.5em;
+  border-radius: 3px;
+  background: #92929f;
+  color: rgb(243, 244, 239);
+}
+
+#metabolismSpeedSelect, #presetDrinkSelect {
+  height: 1.7rem;
+}
+
+button {
+  background-color: rgb(243, 244, 239);
+  color: #383642;
+  border: none;
+  box-shadow: none;
+  height: 3.5em;
+  padding: 1em;
+  margin: 1em;
+  border-radius: 0.3em;
+  cursor: pointer;
+}
+
+button:hover,
+button:focus {
+  background: #dddddd;
+}
+
+.actualDataSubContainer {
+  background: #F3F4EF;
+  padding: 1.5em;
+  border-radius: 50px;
+  font-size: 2em;
+  text-align: center;
+  width: 1em;
+  height: 1em;
+}
+.userDataContainer {
+  background: #F3F4EF;
+  border-radius: 5px;
+  padding: 0.3em;
+}
+.userDataSubContainer {
+  background: #F3F4EF;
+  font-size: 0.9em;
+  margin: 0.6em;
+}
+.graphContainer {
+  margin: auto;
+}
+canvas {
+  padding: 1em;
+  color: #F3F4EF;
+  background: #92929f
+}
+
+.dataTableContainer {
+  font-size: 0.8em;
+  margin: auto;
+  color: #F3F4EF;
+  background: #92929f
+}
+#valuesTable {
+  color: #F3F4EF;
+  background: #92929f
 }

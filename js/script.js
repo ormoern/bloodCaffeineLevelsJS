@@ -6,6 +6,11 @@ rgb(255, 248, 232)
 rgb(223, 224, 223)
 
 */
+
+// access message container
+
+const messageContainer = document.getElementById("messageContainer");
+
 // --- HELPER FUNCTIONS ---
 
 // create option values for select input type
@@ -80,12 +85,12 @@ const checkInputText = (textInput, inputType) => {
   if (textInput.length === 0 || textInput === null) {
     errorType = "Empty," + inputType;
     errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
+    messageContainer.textContent = errorMessage;
 
     inputValid = false;
 
     setTimeout(async () => {
-      ui.errorMessageContainer.textContent = "";
+      messageContainer.textContent = "";
     }, 5000);
     return inputValid
   } else {
@@ -103,9 +108,9 @@ const checkInputNumber = (numberInput, inputType) => {
   if (numberInput.length === 0 || numberInput === null || numberInput < 0) {
     errorType = "Empty," + inputType;
     errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
+    messageContainer.textContent = errorMessage;
     setTimeout(() => {
-      ui.errorMessageContainer.textContent = "";
+      messageContainer.textContent = "";
     }, 5000);
     console.log(errorMessage)
     inputValid = false;
@@ -113,9 +118,9 @@ const checkInputNumber = (numberInput, inputType) => {
   } else if (regex.test(numberInput)) {
     errorType = "Symbols," + inputType;
     errorMessage = state.errorMessages[errorType];
-    ui.errorMessageContainer.textContent = errorMessage;
+    messageContainer.textContent = errorMessage;
     setTimeout(() => {
-      ui.errorMessageContainer.textContent = "";
+      messageContainer.textContent = "";
     }, 5000);
     console.log(errorMessage)
     inputValid = false;
@@ -139,7 +144,7 @@ const state = {
   },
   userData: {
     "bodyMass": 70,
-    "metabolismSpeedDisplay": "Medium",
+    "metabolismSpeedDisplay": "Average metabolism",
     "metabolismSpeed": 5.7,
     "currentCaffeineLevel": 0
   },
@@ -166,9 +171,9 @@ const state = {
     "Energy drink (500ml)": 150
   },
   metabolismSpeed: {
-    "Medium": 5.7,
-    "High": 3.5,
-    "Low": 7.5
+    "Average": 5.7,
+    "Fast": 3.5,
+    "Slow": 7.5
   },
   defaultTableValues: [
     "Time",
@@ -202,14 +207,15 @@ const state = {
           chartArea.top
         );
 
-        gradient.addColorStop(1, 'rgba(154, 115, 38, 0.4)');
-        gradient.addColorStop(0, 'rgba(154, 115, 38, 0)');
+        gradient.addColorStop(1, 'rgb(138, 110, 110)');
+        gradient.addColorStop(0, 'rgba(138, 110, 110, 0)');
 
         return gradient;
       }
     }],
   },
   chartOptions: {
+    responsive: true,
     animation: false,
     animations: {
       colors: false,
@@ -229,7 +235,7 @@ const state = {
       line: {
         borderCapStyle: 'round',
         borderJoinStyle: 'round',
-        borderColor: 'rgb(154, 115, 38)',
+        borderColor: 'rgb(138, 110, 110)',
         borderWidth: 2,
         tension: 0.4,
       },
@@ -248,7 +254,7 @@ const state = {
             ""
             return returnValue
           },
-          color: 'rgb(102, 76, 25)',
+          color: 'rgb(243, 244, 239)',
         },
         grid: {
           display: false,
@@ -258,10 +264,10 @@ const state = {
         ticks: {
           type: 'linear',
           stepSize: 1,
-          color: 'rgb(102, 76, 25)',
+          color: 'rgb(243, 244, 239)'
         },
         grid: {
-          color: 'rgb(223, 224, 223)',
+          color: 'rgb(170, 169, 169)',
         },
       },
     },
@@ -348,9 +354,6 @@ function renderUI() {
   const dataContainer = document.getElementById("dataContainer");
 
   // --- create subcontainers ---
-  
-  // message container
-  const errorMessageContainer = document.createElement("div");
 
   // data input
   const presetDrinkContainer = document.createElement("div");
@@ -373,6 +376,8 @@ function renderUI() {
   const bodyMassContainer = document.createElement("div");
   const metabolismSpeedContainer = document.createElement("div");
   const currentCaffeineContainer = document.createElement("div");
+
+  const userDataContainer = document.createElement("div");
   
   // --- assign classes and add to main containers ---
 
@@ -380,26 +385,26 @@ function renderUI() {
   presetDrinkContainer.classList.add("inputSubSubContainer");
   customDrinkContainer.classList.add("inputSubSubContainer");
   userInfoContainer.classList.add("inputSubSubContainer");
-  errorMessageContainer.classList.add("inputSubSubContainer");
+  buttonsContainer.classList.add("inputSubContainer");
 
-  errorMessageContainer.id = "errorMessageContainer";
-
-  inputContainers.classList.add("inputSubContainer")
+  inputContainers.classList.add("inputSubContainer");
 
   // assign classes to data presenting subcontainers
   dataValuesContainer.classList.add("dataSubContainer")
-  graphContainer.classList.add("dataSubContainer")
+  graphContainer.classList.add("graphContainer");
+  userDataContainer.classList.add("userDataContainer");
 
+  userDataContainer.style.display = "none";
+  
   // assign classes to data value subcontainers
   actualDataContainer.classList.add("dataValuesSubContainer")
-  drinkTableContainer.classList.add("dataValuesSubContainer")
-  bodyMassContainer.classList.add("actualDataSubContainer")
-  metabolismSpeedContainer.classList.add("actualDataSubContainer")
+  drinkTableContainer.classList.add("dataTableContainer")
+  bodyMassContainer.classList.add("userDataSubContainer")
+  metabolismSpeedContainer.classList.add("userDataSubContainer")
   currentCaffeineContainer.classList.add("actualDataSubContainer")
 
   // add subcontainers to main containers
   inputContainer.append(
-    errorMessageContainer,
     inputContainers,
     buttonsContainer
   );
@@ -416,9 +421,12 @@ function renderUI() {
     graphContainer,
     drinkTableContainer,
   );
-  actualDataContainer.append(
+  userDataContainer.append(
     bodyMassContainer,
-    metabolismSpeedContainer,
+    metabolismSpeedContainer
+  )
+  actualDataContainer.append(
+    userDataContainer,
     currentCaffeineContainer
   );
 
@@ -427,7 +435,7 @@ function renderUI() {
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
   bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
   metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
-  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"] + ` mg/L`;
+  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"] + ` mg/l`;
 
   // --- create input elements and append to subcontainers ---
   // time and preset drink
@@ -461,7 +469,8 @@ function renderUI() {
     name: "customDrink",
     value: "",
     id: "customDrinkName",
-    placeholder: "Coffee"
+    placeholder: "Coffee",
+    disabled: true,
   });
   
   const customDrinkCaffeineBox = document.createElement("input");
@@ -470,7 +479,8 @@ function renderUI() {
     name: "customCaffeineAmount",
     value: "",
     id: "customCaffeine",
-    placeholder: "100"
+    placeholder: "100",
+    disabled: true,
    });
 
   const customDrinkCheckBox = document.createElement("input");
@@ -515,13 +525,12 @@ function renderUI() {
   Object.assign(userInfoSaveButton, {
     name: "saveUserInfo",
     id: "userInfoSaveButton",
-    textContent: "Update"
+    textContent: "Save info"
   });
 
   userInfoContainer.append(
     bodyMassBox, 
     metabolismSpeedSelect,
-    userInfoSaveButton
   );
 
   // main controls
@@ -541,12 +550,12 @@ function renderUI() {
   buttonsContainer.append(
     addDataButton, 
     clearDataButton,
+    userInfoSaveButton
   );
 
   return { 
     inputContainer,
     dataContainer,
-    errorMessageContainer, 
     presetDrinkContainer, 
     userInfoContainer, 
     buttonsContainer, 
@@ -559,7 +568,6 @@ function renderUI() {
     userInfoSaveButton, 
     addDataButton, 
     clearDataButton, 
-    showGraphButton,
     timeInputBox,
     presetDrinkSelect,
     customDrinkNameBox,
@@ -687,11 +695,22 @@ customDrinkCheckBox.addEventListener("change", () => {
     customDrinkName.disabled = false;
     customDrinkCaffeine.disabled = false;
     presetDrink.disabled = true;
+
+    presetDrink.classList.toggle("disabledInput");
+
+    customDrinkName.classList.toggle("disabledInput");
+    customDrinkCaffeine.classList.toggle("disabledInput");
+
   } else {
     state.customDrink = false;
     customDrinkName.disabled = true;
     customDrinkCaffeine.disabled = true;
     presetDrink.disabled = false;
+
+    presetDrink.classList.toggle("disabledInput");
+
+    customDrinkName.classList.toggle("disabledInput");
+    customDrinkCaffeine.classList.toggle("disabledInput");
   };
 
 });
@@ -700,7 +719,6 @@ customDrinkCheckBox.addEventListener("change", () => {
 // access buttons
 const addDataButton = ui.addDataButton;
 const clearDataButton = ui.clearDataButton;
-const showGraphButton = ui.showGraphButton;
 const userInfoSaveButton = ui.userInfoSaveButton;
 
 userInfoSaveButton.addEventListener("click", () => {
@@ -717,7 +735,7 @@ userInfoSaveButton.addEventListener("click", () => {
   console.log(state.userData)
 
   bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
-  metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
+  metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"] + ` metabolism`;
 });
 
 addDataButton.addEventListener("click", () => {
@@ -725,9 +743,9 @@ addDataButton.addEventListener("click", () => {
   let timeValue = 0
 
   if (!timeInput.value) {
-    ui.errorMessageContainer.textContent = "Time not provided..."
+    messageContainer.textContent = "Time not provided..."
     setTimeout(() => {
-      ui.errorMessageContainer.textContent = "";
+      messageContainer.textContent = "";
     }, 5000);
   } else {
     timeValue = timeInput.value;
@@ -745,9 +763,9 @@ addDataButton.addEventListener("click", () => {
         "Caffeine, mg": parseInt(customDrinkCaffeineValue)
       };
     } else if (!customDrinkNameValid && !customDrinkCaffeineValid) {
-        ui.errorMessageContainer.textContent = "No custom drink info provided...";
+        messageContainer.textContent = "No custom drink info provided...";
         setTimeout(() => {
-          ui.errorMessageContainer.textContent = "";
+          messageContainer.textContent = "";
         }, 5000);
       };
   } else if (presetDrink && timeValue) {
@@ -773,7 +791,7 @@ addDataButton.addEventListener("click", () => {
   const valuePairs = state.chartData.xyPairs;
   const currentCaffeine = findYValue(valuePairs, currentTime);
 
-  currentCaffeineContainer.textContent = currentCaffeine ? roundResult(currentCaffeine) + ` mg/L` : "0 mg/L";
+  currentCaffeineContainer.textContent = currentCaffeine ? roundResult(currentCaffeine) + ` mg/l` : "0 mg/l";
 
   caffeineChart.data.datasets[0].data = state.chartData.totalConcentration;
   caffeineChart.data.labels = state.chartData.timePoints;
@@ -784,7 +802,7 @@ clearDataButton.addEventListener("click", () => {
   state.data = [];
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
 
-  currentCaffeineContainer.textContent = "0 mg/L";
+  currentCaffeineContainer.textContent = "0 mg/l";
 
   state.chartData = [];
   caffeineChart.data.datasets[0].data = [];
