@@ -207,8 +207,8 @@ const state = {
           chartArea.top
         );
 
-        gradient.addColorStop(1, 'rgb(138, 110, 110)');
-        gradient.addColorStop(0, 'rgba(138, 110, 110, 0)');
+        gradient.addColorStop(1, 'rgb(243, 244, 239)');
+        gradient.addColorStop(0, 'rgba(243, 244, 239, 0)');
 
         return gradient;
       }
@@ -235,7 +235,7 @@ const state = {
       line: {
         borderCapStyle: 'round',
         borderJoinStyle: 'round',
-        borderColor: 'rgb(138, 110, 110)',
+        borderColor: 'rgb(243, 244, 239)',
         borderWidth: 2,
         tension: 0.4,
       },
@@ -435,7 +435,8 @@ function renderUI() {
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
   bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
   metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
-  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"] + ` mg/l`;
+  
+  currentCaffeineContainer.innerHTML = `<span>` + state.userData["currentCaffeineLevel"] + `mg/l</span>`;
 
   // --- create input elements and append to subcontainers ---
   // time and preset drink
@@ -791,7 +792,9 @@ addDataButton.addEventListener("click", () => {
   const valuePairs = state.chartData.xyPairs;
   const currentCaffeine = findYValue(valuePairs, currentTime);
 
-  currentCaffeineContainer.textContent = currentCaffeine ? roundResult(currentCaffeine) + ` mg/l` : "0 mg/l";
+  const caffeineContentMgL = currentCaffeine ? roundResult(currentCaffeine) : 0;
+
+  currentCaffeineContainer.innerHTML = `<span>` + caffeineContentMgL + `mg/l</span>`;
 
   caffeineChart.data.datasets[0].data = state.chartData.totalConcentration;
   caffeineChart.data.labels = state.chartData.timePoints;
@@ -802,7 +805,7 @@ clearDataButton.addEventListener("click", () => {
   state.data = [];
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
 
-  currentCaffeineContainer.textContent = "0 mg/l";
+  currentCaffeineContainer.innerHTML = `<span>0 mg/l</span>`;
 
   state.chartData = [];
   caffeineChart.data.datasets[0].data = [];
