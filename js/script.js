@@ -1,5 +1,13 @@
-// --- GLOBAL STATE VALUES ---
+/* palette 
 
+#9a7326
+#a78d65
+rgb(255, 248, 232)
+rgb(223, 224, 223)
+
+*/
+
+// --- GLOBAL STATE VALUES ---
 const state = {
   data: [],
   chartData: [],
@@ -11,9 +19,9 @@ const state = {
     "Undefined": "Undefined error"
   },
   userData: {
-    "bodyMass": 0,
+    "bodyMass": 70,
     "metabolismSpeedDisplay": "Medium",
-    "metabolismSpeed": 0,
+    "metabolismSpeed": 5.7,
     "currentCaffeineLevel": 0
   },
   customDrink: false,
@@ -39,8 +47,8 @@ const state = {
     "Energy drink (500ml)": 150
   },
   metabolismSpeed: {
-    "High": 3.5,
     "Medium": 5.7,
+    "High": 3.5,
     "Low": 7.5
   },
   defaultTableValues: [
@@ -51,6 +59,73 @@ const state = {
   graphValues: {
     "timePeriodHH": 30,
     "points": 60 * 30, // 60 points per hour
+  },
+  chartDefaultData: {
+    labels: [],
+    datasets: [{
+      label: 'Caffeine concentration, mg',
+      data: [],
+      cubicInterpolationMode: "monotone",
+      fill: true,
+      backgroundColor: (context) => {
+        const chart = context.chart;
+        const { ctx, chartArea } = chart;
+
+        if (!chartArea) {
+          return null
+        };
+
+        const gradient = ctx.createLinearGradient(
+          0, 
+          chartArea.bottom, 
+          0, 
+          chartArea.top
+        );
+
+        gradient.addColorStop(1, 'rgb(167, 141, 101)');
+        gradient.addColorStop(0, 'rgba(154, 115, 38, 0.8)');
+
+        return gradient;
+      }
+    }],
+  },
+  chartOptions: {
+    animation: false,
+    animations: {
+      colors: false,
+      x: false,
+    },
+    transitions: {
+      active: {
+        animation: {
+          duration: 0,
+        },
+      },
+    },
+    elements: {
+      line: {
+        borderCapStyle: 'round',
+        borderJoinStyle: 'round',
+        borderColor: 'rgb(154, 115, 38)',
+        borderWidth: 2,
+        tension: 0.4,
+      },
+      point: {
+        radius: 0,
+      }
+    },
+    scales: {
+      x: {
+      },
+      y: {
+      },
+    },
+    plugins: {
+      decimation: {
+        enabled: true,
+        algorithm: 'lttb',
+      },
+    }
   },
 };
 
@@ -67,6 +142,17 @@ const createSelectOptions = (valueObject, selectElement) => {
     option.textContent = item;
     selectElement.append(option);
   });
+};
+
+const roundResult = (result) => {
+    return (Math.round(result * 100)) / 100;
+};
+
+const getCurrentTimeInDec = () => {
+    const now = new Date();
+    const minutes = (now.getMinutes() / 60);
+
+    return now.getHours() + roundResult(minutes);
 };
 
 // --- UI RENDERING ---
@@ -206,9 +292,9 @@ function renderUI() {
   // default content of data containers
 
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
-  bodyMassContainer.textContent = state.userData["bodyMass"];
+  bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
   metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
-  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"];
+  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"] + ` mg/L`;
 
   // --- create input elements and append to subcontainers ---
   // time and preset drink
@@ -374,9 +460,10 @@ const createXValueArray = (start, end, pointsAmount) => {
   const xArray = [];
 
   for (let i = 0; i < pointsAmount; i++) {
-    xArray.push(start + (i * step))
+    const xValue = start + (i * step);
+    xArray.push(roundResult(xValue));
   };
-  console.log("Created array of X values:" + xArray);
+  console.log("Created array of X values");
   return xArray
 };
 const caffeineConcentration = (caffeineMg, bodyMass) => { 
@@ -416,11 +503,12 @@ const createXYArray = (intakeData, userData) => {
   });
   console.log(totalConcentration)
 
-  //const xyPairs = xs.map((x, i) => [x, totalConcentration[i]]);
-
+  const xyPairs = timePoints.map((x, i) => [x, totalConcentration[i]]);
+  console.log(xyPairs);
   return { 
     totalConcentration,
-    timePoints
+    timePoints,
+    xyPairs
   }
 };
 const renderGraph = (container) => {
@@ -428,16 +516,11 @@ const renderGraph = (container) => {
   canvasContainer.id = "caffeineChart";
   container.append(canvasContainer);
   const defaultTimePoints = createXValueArray(0, 24, 24*60);
-  caffeineChart = new Chart(canvasContainer , {
+  state.chartDefaultData.labels = defaultTimePoints;
+  caffeineChart = new Chart(canvasContainer, {
     type: 'line',
-    data: {
-      labels: defaultTimePoints,
-      datasets: [{
-        label: 'Caffeine concentration, mg',
-        data: [],
-        borderWidth: 1
-      }]
-    },
+    data: state.chartDefaultData,
+    options: state.chartOptions,
   });
 };
 
@@ -461,7 +544,7 @@ const checkInputText = (textInput, inputType) => {
 
     inputValid = false;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       ui.errorMessageContainer.textContent = "";
     }, 5000);
     return inputValid
@@ -481,6 +564,9 @@ const checkInputNumber = (numberInput, inputType) => {
     errorType = "Empty," + inputType;
     errorMessage = state.errorMessages[errorType];
     ui.errorMessageContainer.textContent = errorMessage;
+    setTimeout(() => {
+      ui.errorMessageContainer.textContent = "";
+    }, 5000);
     console.log(errorMessage)
     inputValid = false;
     return inputValid
@@ -488,6 +574,9 @@ const checkInputNumber = (numberInput, inputType) => {
     errorType = "Symbols," + inputType;
     errorMessage = state.errorMessages[errorType];
     ui.errorMessageContainer.textContent = errorMessage;
+    setTimeout(() => {
+      ui.errorMessageContainer.textContent = "";
+    }, 5000);
     console.log(errorMessage)
     inputValid = false;
     return inputValid
@@ -495,10 +584,6 @@ const checkInputNumber = (numberInput, inputType) => {
     inputValid = true;
     return inputValid
   };
-
-  setTimeout(() => {
-    ui.errorMessageContainer.textContent = "";
-  }, 5000);
 };
 
 // --- DATA PARSING ---
@@ -508,6 +593,14 @@ const timeToDecInt = (timeInput) => {
   const minutesInt = parseInt(timeInput.slice(-2));
   const timeDec = ((Math.round((hoursInt + (minutesInt / 60)) * 100)) / 100)
   return timeDec
+};
+
+const findYValue = (xyArray, time) => {
+  for (const entry of xyArray) {
+    if (entry[0] === time) {
+      return entry[1]
+    };
+  };
 };
 
 // containers
@@ -564,9 +657,8 @@ userInfoSaveButton.addEventListener("click", () => {
   state.userData.metabolismSpeed = state.metabolismSpeed[metabolismSpeedValue];
   console.log(state.userData)
 
-  bodyMassContainer.textContent = state.userData["bodyMass"];
+  bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
   metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"];
-  currentCaffeineContainer.textContent = state.userData["currentCaffeineLevel"];
 });
 
 addDataButton.addEventListener("click", () => {
@@ -616,7 +708,13 @@ addDataButton.addEventListener("click", () => {
   console.log("Data entry:", dataOutput)
   console.log("Aggregate data:", state.data)
 
-  state.chartData = createXYArray(state.data, state.userData)
+  state.chartData = createXYArray(state.data, state.userData);
+
+  const currentTime = getCurrentTimeInDec();
+  const valuePairs = state.chartData.xyPairs;
+  const currentCaffeine = findYValue(valuePairs, currentTime);
+
+  currentCaffeineContainer.textContent = roundResult(currentCaffeine) + ` mg/L`;
 
   caffeineChart.data.datasets[0].data = state.chartData.totalConcentration;
   caffeineChart.data.labels = state.chartData.timePoints;
@@ -625,11 +723,11 @@ addDataButton.addEventListener("click", () => {
 
 clearDataButton.addEventListener("click", () => {
   state.data = [];
-  state.userData = {};
-  const dataTable = document.getElementById("ValuesTable");
   tableWithDefaultValues(state.defaultTableValues, drinkTableContainer);
 
-  state.chartData =[]
+  currentCaffeineContainer.textContent = "0 mg/L";
+
+  state.chartData = [];
   caffeineChart.data.datasets[0].data = [];
   caffeineChart.data.labels = createXValueArray(0, 24, 24*60);
   caffeineChart.update();
