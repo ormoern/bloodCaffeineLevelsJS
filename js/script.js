@@ -750,6 +750,22 @@ userInfoSaveButton.addEventListener("click", () => {
 
   bodyMassContainer.textContent = state.userData["bodyMass"] + ` kg`;
   metabolismSpeedContainer.textContent = state.userData["metabolismSpeedDisplay"] + ` metabolism`;
+
+  state.chartData = createXYArray(state.data, state.userData);
+
+  const currentTime = getCurrentTimeInDec();
+  console.log(currentTime);
+  const valuePairs = state.chartData.xyPairs;
+  console.log(valuePairs);
+  const currentCaffeine = findYValue(valuePairs, currentTime);
+
+  console.log(currentCaffeine);
+
+  currentCaffeineValueContainer.textContent = currentCaffeine ? roundResult(currentCaffeine) : 0;
+
+  caffeineChart.data.datasets[0].data = state.chartData.totalConcentration;
+  caffeineChart.data.labels = state.chartData.timePoints;
+  caffeineChart.update();
 });
 
 addDataButton.addEventListener("click", () => {
